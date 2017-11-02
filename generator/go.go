@@ -88,6 +88,10 @@ var goKeywords = map[string]bool{
 	"import":      true,
 	"return":      true,
 	"var":         true,
+	// go-thrift generator keywords.
+	"req": true,
+	"res": true,
+	"err": true,
 }
 
 var basicTypes = map[string]bool{
