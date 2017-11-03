@@ -89,9 +89,10 @@ var goKeywords = map[string]bool{
 	"return":      true,
 	"var":         true,
 	// go-thrift generator keywords.
-	"req": true,
-	"res": true,
-	"err": true,
+	"req":  true,
+	"res":  true,
+	"err":  true,
+	"self": true,
 }
 
 var basicTypes = map[string]bool{
@@ -505,7 +506,7 @@ func (g *GoGenerator) writeService(out io.Writer, svc *parser.Service) error {
 		if !method.Oneway {
 			resArg = fmt.Sprintf(", res *%s%sResponse", svcName, mName)
 		}
-		g.write(out, "\nfunc (s *%sServer) %s(req *%s%sRequest%s) error {\n", svcName, mName, svcName, mName, resArg)
+		g.write(out, "\nfunc (self *%sServer) %s(req *%s%sRequest%s) error {\n", svcName, mName, svcName, mName, resArg)
 		var args []string
 		for _, arg := range method.Arguments {
 			aName := camelCase(arg.Name)
@@ -516,7 +517,7 @@ func (g *GoGenerator) writeService(out io.Writer, svc *parser.Service) error {
 		if !isVoid {
 			val = "val, "
 		}
-		g.write(out, "\t%serr := s.Implementation.%s(%s)\n", val, mName, strings.Join(args, ", "))
+		g.write(out, "\t%serr := self.Implementation.%s(%s)\n", val, mName, strings.Join(args, ", "))
 		if len(method.Exceptions) > 0 {
 			g.write(out, "\tswitch e := err.(type) {\n")
 			for _, ex := range method.Exceptions {
@@ -573,7 +574,7 @@ func (g *GoGenerator) writeService(out io.Writer, svc *parser.Service) error {
 		if !method.Oneway {
 			returnType = g.formatReturnType(method.ReturnType, true)
 		}
-		g.write(out, "\nfunc (s *%sClient) %s(%s) %s {\n",
+		g.write(out, "\nfunc (self *%sClient) %s(%s) %s {\n",
 			svcName, methodName,
 			g.formatArguments(method.Arguments),
 			returnType)
@@ -594,7 +595,7 @@ func (g *GoGenerator) writeService(out io.Writer, svc *parser.Service) error {
 		}
 
 		// Call
-		g.write(out, "\terr = s.Client.Call(\"%s\", req, res)\n", method.Name)
+		g.write(out, "\terr = self.Client.Call(\"%s\", req, res)\n", method.Name)
 
 		// Exceptions
 		if len(method.Exceptions) > 0 {
