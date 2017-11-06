@@ -283,7 +283,11 @@ func (g *GoGenerator) formatArguments(arguments []*parser.Field) string {
 		if arg.Optional {
 			opt |= toOptional
 		}
-		args[i] = fmt.Sprintf("%s %s", validGoIdent(lowerCamelCase(arg.Name)), g.formatType(g.pkg, g.thrift, arg.Type, opt))
+		args[i] = fmt.Sprintf(
+			"%s %s",
+			validGoIdent(lowerCamelCase(arg.Name)),
+			g.formatType(g.pkg, g.thrift, arg.Type, opt),
+		)
 	}
 	return strings.Join(args, ", ")
 }
@@ -582,7 +586,12 @@ func (g *GoGenerator) writeService(out io.Writer, svc *parser.Service) error {
 		// Request
 		g.write(out, "\treq := &%s%sRequest{\n", svcName, methodName)
 		for _, arg := range method.Arguments {
-			g.write(out, "\t\t%s: %s,\n", camelCase(arg.Name), validGoIdent(lowerCamelCase(arg.Name)))
+			g.write(
+				out,
+				"\t\t%s: %s,\n",
+				camelCase(arg.Name),
+				validGoIdent(lowerCamelCase(arg.Name)),
+			)
 		}
 		g.write(out, "\t}\n")
 
